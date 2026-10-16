@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ef3b24">
+  <meta name="description" content="caring CARE-RING 신인 설계사 교육용 화재보험 업종·건물급수·추천담보 시뮬레이터">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <title>CARE-RING | 화재보험 설계 시뮬레이터</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="brand"><span class="brand-symbol">caring</span><span class="brand-divider"></span><span>CARE-RING 신인 설계사 교육</span></div>
+      <span class="header-tag">화재보험 설계 시뮬레이터</span>
+    </div>
+  </header>
+  <main class="shell app-shell">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">FIRE INSURANCE · TRAINING GUIDE</p>
+        <h1>화재보험 설계 시뮬레이터</h1>
+        <p>물건구분과 업종을 고르고 현장 상황을 입력하면, 건물급수·추천상품·33개 담보의 우선순위가 자동으로 바뀝니다.</p>
+      </div>
+      <button id="printButton" type="button" class="button secondary print-btn">설계 결과 인쇄</button>
+    </section>
+
+    <div class="notice"><span class="notice-mark">!</span> 신인 교육용 설계 가이드입니다. <strong>보험료·인수 승인·실제 보상 확정 자료가 아닙니다.</strong> 법정 의무보험과 메리츠 현행 인수조건은 최종 설계 시 전산·공식 기준을 대조하세요.</div>
+
+    <nav class="nav-tabs" aria-label="시뮬레이터 메뉴">
+      <button type="button" class="nav-tab active" data-page="design" aria-current="page">설계 가이드</button>
+      <button type="button" class="nav-tab" data-page="questions">현장 확인질문 <span id="answerCount" class="small-count"></span></button>
+      <button type="button" class="nav-tab" data-page="facility">시설업종 검색</button>
+      <button type="button" class="nav-tab" data-page="ksic">KSIC 참고</button>
+    </nav>
+
+    <section id="page-design" class="page active">
+      <div class="section-title"><span>01</span><h2>고객 사업장 정보</h2></div>
+      <div class="panel">
+        <div class="field-grid">
+          <label class="field"><span>물건 구분</span><select id="kind"><option>일반물건</option><option>주택물건</option><option>공장물건</option></select></label>
+          <label class="field large"><span>업종 검색</span><input id="industryFilter" type="search" placeholder="업종명·코드 검색 (예: 음식점, 01020)" autocomplete="off" aria-label="업종명 필터"></label>
+          <label class="field large"><span>세부 업종</span><select id="industry"></select></label>
+          <label class="field"><span>층수</span><select id="floor"><option>지하층</option><option>1층</option><option>2층 이상</option><option>건물전체</option></select></label>
+          <label class="field"><span>사업장 면적 (㎡)</span><input id="area" inputmode="decimal" type="number" min="0" step="0.1" placeholder="면적 입력"></label>
+          <div class="field output-field"><span>평수 환산</span><output id="pyeong">—</output></div>
+          <label class="field large"><span>주출입구 형태</span><select id="entrance"><option>미확인</option><option>외부지면 직통·단층</option><option>비직통 또는 내부복층</option></select></label>
+          <label class="field"><span>사용승인일</span><input id="approvedAt" type="text" inputmode="numeric" maxlength="10" placeholder="20221222 또는 2022-12-22" autocomplete="off"></label>
+          <div class="field output-field"><span>건축연한 (만)</span><output id="age">—</output></div>
+        </div>
+        <p class="field-tip">사용승인일은 <strong>20221222</strong>처럼 숫자 8자리로 입력해도 됩니다. 건축연한 20년 이상은 주택 임대인배상책임·일반물건 급배수시설누출손해 인수 제한에 자동 반영됩니다.</p>
+      </div>
+
+      <div class="section-title"><span>02</span><h2>건물 구조부별 급수 계산</h2></div>
+      <div class="panel">
+        <div class="field-grid materials-grid">
+          <label class="field"><span>기둥(조)</span><select id="pillar"></select></label>
+          <label class="field"><span>지붕</span><select id="roof"></select></label>
+          <label class="field"><span>외벽</span><select id="wall"></select></label>
+        </div>
+        <div class="result-grid">
+          <div class="result-box"><span>최종 건물급수</span><strong id="grade">1급</strong><small id="gradeDetails">전체 내화구조</small></div>
+          <div class="result-box key"><span>자동 추천상품</span><strong id="product">성공파트너</strong><small id="productDetails">설계 시 현행 인수기준 확인</small></div>
+        </div>
+      </div>
+
+      <div class="section-title"><span>03</span><h2>법정 의무보험 자동진단</h2></div>
+      <div class="panel legal-panel">
+        <div id="legalBox" class="legal-result" aria-live="polite">진단 중…</div>
+        <div class="small-note">다중이용업소·재난배상 대상의 업종·면적·층수·출입구 조건을 판정합니다. 인허가 형태나 상세 시설조건이 필요한 경우 자동으로 ‘시설조건 확인’을 표시합니다.</div>
+      </div>
+
+      <div class="section-title recommendation-heading"><span>04</span><h2>업종별 33개 추천보장</h2></div>
+      <div class="summary-row" id="summary"></div>
+      <div class="status-toolbar">
+        <div class="filter-pills" role="group" aria-label="추천보장 필터">
+          <button type="button" class="filter-pill active" data-status="all">전체</button>
+          <button type="button" class="filter-pill" data-status="[필수]">필수</button>
+          <button type="button" class="filter-pill" data-status="[권장]">권장</button>
+          <button type="button" class="filter-pill" data-status="[선택]">선택</button>
+          <button type="button" class="filter-pill" data-status="other">확인·제한</button>
+        </div>
+        <button type="button" id="questionsShortcut" class="text-button">현장조건 답변하기 →</button>
+      </div>
+      <div id="coverages" aria-live="polite"></div>
+      <div class="under-note">[필수] 우선 설계 · [권장] 적극 제안 · [선택] 위험 확인 · [인수불가] 설계 제외 · [시설조건/입력필요] 추가 확인 후 판단</div>
+      <div class="bottom-actions"><button type="button" id="resetButton" class="button secondary">입력값 초기화</button><button type="button" class="button primary" id="bottomPrint">설계 결과 인쇄</button></div>
+    </section>
+
+    <section id="page-questions" class="page">
+      <div class="section-title"><span>05</span><h2>현장 확인 질문</h2></div>
+      <div class="panel">
+        <p class="page-lead">고객에게 해당되는 항목만 답해도 됩니다. ‘미확인’이면 엑셀의 업종 기본 추천이 유지되며, 일부 담보는 [입력필요]·[시설조건]으로 안내합니다.</p>
+        <div class="question-toolbar"><span id="progressLabel">답변 0개</span><button type="button" id="clearAnswers" class="text-button">답변만 초기화</button></div>
+        <div id="questionList" class="question-list"></div>
+        <button type="button" class="button primary" id="backToDesign">추천보장 결과 확인 →</button>
+      </div>
+    </section>
+
+    <section id="page-facility" class="page">
+      <div class="section-title"><span>06</span><h2>시설소유관리자 업종 검색</h2></div>
+      <div class="panel">
+        <p class="page-lead">첨부된 시설소유자배상책임 업종표의 <strong>104개 업종</strong>을 검색합니다. 시설코드가 없는 업종은 임의로 인수 가능하다고 표시하지 않습니다.</p>
+        <label class="field full"><span>업종명·직종코드 검색</span><input id="facilitySearch" type="search" autocomplete="off" placeholder="예: 음식점, 병원, 01010"></label>
+        <div id="facilityResults" class="lookup-list"></div>
+      </div>
+    </section>
+
+    <section id="page-ksic" class="page">
+      <div class="section-title"><span>07</span><h2>KSIC 11차 업종명 참고검색</h2></div>
+      <div class="notice toned">한국표준산업분류(KSIC)는 업종명을 찾는 참고자료입니다. <strong>KSIC 코드 = 메리츠 요율업종코드가 아닙니다.</strong> 이 검색 결과만으로 인수 가능 여부를 판정하지 않습니다.</div>
+      <div class="panel">
+        <label class="field full"><span>업종명·KSIC 5자리 코드</span><input id="ksicSearch" type="search" autocomplete="off" placeholder="예: 치킨, 소프트웨어, 56111"></label>
+        <div id="ksicResults" class="lookup-list"></div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="shell footer-inner"><span>caring · CARE-RING 화재보험 교육용</span><span>탄방케어링 오선근 CM</span></div></footer>
+</body>
+</html>
