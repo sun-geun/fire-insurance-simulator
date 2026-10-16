@@ -1,0 +1,10 @@
+{
+  "name": "CARE-RING 화재보험 설계 시뮬레이터",
+  "short_name": "CARE-RING 화재",
+  "description": "신인 설계사용 화재보험 업종·추천담보 가이드",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#ef3b24",
+  "icons": [{ "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
